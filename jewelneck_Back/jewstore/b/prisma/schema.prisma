@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  user_id    Int      @id @default(autoincrement())
+  email      String   @unique @db.VarChar(100)
+  password   String   @db.VarChar(100)
+  fullName   String   @db.VarChar(100)
+  createdAt  DateTime @default(now())
+}
+
+model cart {
+  cart_id   Int       @id @default(autoincrement())
+  cust_id   Int
+  prod_id   Int
+  created   DateTime? @default(now()) @db.Timestamp(0)
+  customers customers @relation(fields: [cust_id], references: [cust_id], onDelete: Cascade, map: "zob")
+  product   product   @relation(fields: [prod_id], references: [prod_id], onDelete: Cascade, map: "zobb")
+
+  @@index([cust_id], map: "zob_idx")
+  @@index([prod_id], map: "zobb_idx")
+}
+
+model customers {
+  cust_id  Int      @id @default(autoincrement())
+  username String   @db.VarChar(100)
+  email    String   @unique(map: "email") @db.VarChar(100)
+  pass     String   @db.VarChar(100)
+  phone    String?  @unique(map: "phone") @db.VarChar(20)
+  cart     cart[]
+  orders   orders[]
+}
+
+model orders {
+  order_id  Int       @id @default(autoincrement())
+  cust_id   Int
+  prod_id   Int
+  created   DateTime? @default(now()) @db.Timestamp(0)
+  customers customers @relation(fields: [cust_id], references: [cust_id], onDelete: Cascade, map: "xcv")
+  product   product   @relation(fields: [prod_id], references: [prod_id], onDelete: Cascade, map: "xcvv")
+
+  @@index([cust_id], map: "xcv_idx")
+  @@index([prod_id], map: "xcvv_idx")
+}
+
+model product {
+  prod_id          Int           @id @default(autoincrement())
+  prod_name        String        @db.VarChar(100)
+  prod_description String        @db.VarChar(100)
+  prod_img         String        @default("https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg") @db.VarChar(100)
+  cat_id           Int?
+  cost             Float         @db.Float
+  created          DateTime?     @default(now()) @db.Timestamp(0)
+  cart             cart[]
+  orders           orders[]
+  product_cat      product_cat?  @relation(fields: [cat_id], references: [cat_id], onDelete: Cascade, map: "product_ibfk_1")
+  product_img      product_img[]
+
+  @@index([cat_id], map: "cat_id")
+}
+
+model product_cat {
+  cat_id   Int       @id @default(autoincrement())
+  cat_name String    @db.VarChar(100)
+  product  product[]
+}
+
+model product_img {
+  img_id   Int     @id @default(autoincrement())
+  prod_id  Int
+  img      String  @default("https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg") @db.VarChar(100)
+  img_prio Int?
+  product  product @relation(fields: [prod_id], references: [prod_id], onDelete: Cascade, map: "product_img_ibfk_1")
+
+  @@index([prod_id], map: "prod_id")
+}

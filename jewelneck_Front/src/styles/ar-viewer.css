@@ -1,0 +1,60 @@
+
+/* Animation for modal scaling in */
+@keyframes scale-in {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out forwards;
+}
+
+/* Gold and pearl color variables */
+:root {
+  --gold: #d4af37;
+  --gold-light: #f5d485;
+  --gold-dark: #b4942d;
+  --pearl: #f5f5f5;
+  --pearl-light: #ffffff;
+}
+
+/* Button shine effect */
+.button-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-shine::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+  transform: translate(-50%, -50%) rotate(0deg);
+  transform-origin: center;
+  animation: rotate-shine 8s linear infinite;
+  opacity: 0;
+}
+
+@keyframes rotate-shine {
+  0% { transform: translate(-50%, -50%) rotate(0deg); opacity: 0; }
+  20% { opacity: 0.2; }
+  30% { opacity: 0; }
+  60% { opacity: 0; }
+  80% { opacity: 0.2; }
+  100% { transform: translate(-50%, -50%) rotate(360deg); opacity: 0; }
+}
+
+/* Shadow glossy effect */
+.shadow-glossy {
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.1),
+    0 1px 8px rgba(0, 0, 0, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}

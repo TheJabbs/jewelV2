@@ -3,12 +3,18 @@ import {
     Injectable,
     UnauthorizedException,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { LoginDto, SignupDto } from './auth_dtos';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+const JWT_SECRET = 'qwertyuioplkjhgfdsazxcvbnmqwertyuiopplkjhgfdsazxcvbnm';
+
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService) {}
+    constructor(
+        private prisma: PrismaService,
+        private jwt: JwtService,
+    ) {}
 
     async signup(dto: SignupDto): Promise<{ success: boolean }> {
         try {
@@ -36,7 +42,7 @@ export class AuthService {
         }
     }
 
-    async signin(dto: LoginDto): Promise<{ success: boolean }> {
+    async signin(dto: LoginDto): Promise<{ success: boolean; accessToken?: string }> {
         try {
             const user = await this.prisma.users.findUnique({
                 where: { email: dto.email },
@@ -46,7 +52,17 @@ export class AuthService {
                 throw new UnauthorizedException('Invalid email or password');
             }
 
-            return { success: true };
+            const payload = {
+                sub: user.id,
+                email: user.email,
+            };
+
+            const token = await this.jwt.signAsync(payload, {
+                secret: JWT_SECRET,
+                expiresIn: '1h',
+            });
+
+            return { success: true, accessToken: token };
         } catch (error) {
             throw error;
         }
